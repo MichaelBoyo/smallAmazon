@@ -1,4 +1,8 @@
 package com.tbthecoder.smallamazon.dtos;
 
-public record SellerResponse() {
+import com.tbthecoder.smallamazon.models.Store;
+
+public record SellerResponse(String id, Store store) {
+
+
 }

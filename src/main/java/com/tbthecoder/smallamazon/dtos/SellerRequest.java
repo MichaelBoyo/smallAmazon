@@ -1,6 +1,6 @@
 package com.tbthecoder.smallamazon.dtos;
 
-public record SellerRequest(String storePhoneNumber,
+public record SellerRequest(String phoneNumber,
                             String storeEmail,
                             String password,
                             String email,

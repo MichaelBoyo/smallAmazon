@@ -1,22 +1,26 @@
 package com.tbthecoder.smallamazon.models;
 
-import lombok.Builder;
-import lombok.Data;
+import com.tbthecoder.smallamazon.dtos.SellerResponse;
+import lombok.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
+
 
 import java.util.Set;
-@Builder
-@Data
-public class Seller extends User {
-    private Store store;
-    private Set<Product> products;
-    private String storeName;
-    private String storeDescription;
-    private String storeAddress;
-    private String storePhoneNumber;
-    private String storeEmail;
-    private String storeImage;
 
-    public Seller(String id, String firstName, String lastName, String email, String password, Set<Roles> roles) {
-        super(id, firstName, lastName, email, password, roles);
+@Builder
+@Document
+@Getter
+@Setter
+public class Seller extends User {
+    @Id
+    private String id;
+
+    @DBRef
+    private Store store;
+
+    public SellerResponse toSellerResponse() {
+        return new SellerResponse(id,store);
     }
 }
