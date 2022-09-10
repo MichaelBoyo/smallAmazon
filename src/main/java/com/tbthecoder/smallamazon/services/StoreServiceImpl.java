@@ -3,6 +3,7 @@ package com.tbthecoder.smallamazon.services;
 import com.tbthecoder.smallamazon.dtos.SellerRequest;
 import com.tbthecoder.smallamazon.models.Store;
 import com.tbthecoder.smallamazon.repositories.StoreRepository;
+import com.tbthecoder.smallamazon.services.interfaces.StoreService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -29,5 +30,10 @@ public class StoreServiceImpl implements StoreService {
     @Override
     public boolean existsByName(String storeName) {
         return storeRepository.existsByName(storeName);
+    }
+
+    @Override
+    public void deleteAll() {
+        storeRepository.deleteAll();
     }
 }

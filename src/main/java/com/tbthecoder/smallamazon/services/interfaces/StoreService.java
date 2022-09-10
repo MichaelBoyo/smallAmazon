@@ -1,4 +1,4 @@
-package com.tbthecoder.smallamazon.services;
+package com.tbthecoder.smallamazon.services.interfaces;
 
 import com.tbthecoder.smallamazon.dtos.SellerRequest;
 import com.tbthecoder.smallamazon.models.Store;
@@ -10,4 +10,6 @@ public interface StoreService {
     Store saveStore(SellerRequest sellerRequest);
 
     boolean existsByName(String storeName);
+
+    void deleteAll();
 }

@@ -1,8 +1,10 @@
 package com.tbthecoder.smallamazon.controller;
 
 import com.tbthecoder.smallamazon.dtos.*;
-import com.tbthecoder.smallamazon.services.SellerNotFoundException;
-import com.tbthecoder.smallamazon.services.SellerService;
+import com.tbthecoder.smallamazon.exceptions.EmailExistsException;
+import com.tbthecoder.smallamazon.exceptions.StoreNameTakenException;
+import com.tbthecoder.smallamazon.exceptions.UserNotFoundException;
+import com.tbthecoder.smallamazon.services.interfaces.SellerService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -21,7 +23,7 @@ public class SellerController {
     private final SellerService sellerService;
 
     @PostMapping
-    public SellerRegisterResponse register(@RequestBody SellerRequest sellerRequest) {
+    public RegisterResponse register(@RequestBody SellerRequest sellerRequest) throws StoreNameTakenException, EmailExistsException {
         log.info("registering seller");
         return sellerService.register(sellerRequest);
     }
@@ -40,7 +42,7 @@ public class SellerController {
     }
 
     @DeleteMapping("/{id}")
-    public Response deleteSeller(@PathVariable String id) {
+    public Response deleteSeller(@PathVariable String id) throws UserNotFoundException {
         return sellerService.deleteSeller(id);
     }
 
@@ -60,7 +62,7 @@ public class SellerController {
     public ResponseEntity<?> addProduct(@RequestBody AddProductRequest request) {
         try {
             return new ResponseEntity<>(sellerService.addProduct(request), HttpStatus.OK);
-        } catch (SellerNotFoundException e) {
+        } catch (UserNotFoundException e) {
             log.error("error adding producr {}", request);
             return new ResponseEntity<>(new Response(FAILURE, e.getMessage()), HttpStatus.BAD_REQUEST);
         }

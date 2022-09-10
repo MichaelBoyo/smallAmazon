@@ -1,11 +1,11 @@
 package com.tbthecoder.smallamazon.repositories;
 
-import com.tbthecoder.smallamazon.models.Seller;
+import com.tbthecoder.smallamazon.models.Customer;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface SellerRepository extends MongoRepository<Seller, String> {
+public interface CustomerRepository extends MongoRepository<Customer,String> {
     boolean existsByEmail(String email);
-    Seller findSellerByEmail(String email);
+    Customer findCustomerByEmail(String email);
 }

@@ -21,6 +21,8 @@ public class Seller extends User {
     private Store store;
 
     public SellerResponse toSellerResponse() {
-        return new SellerResponse(id,store);
+        return new SellerResponse(id,this.getFirstName(),
+                this.getLastName(), this.getEmail(),
+                this.getPhoneNumber(),store);
     }
 }
