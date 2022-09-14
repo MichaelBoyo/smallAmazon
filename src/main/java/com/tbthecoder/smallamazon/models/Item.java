@@ -15,6 +15,6 @@ public class Item {
     private String itemId;
     @DBRef
     private Product product;
-    private Integer quantity;
+    private Integer qtyOrdered;
     private Double amountTotal;
 }

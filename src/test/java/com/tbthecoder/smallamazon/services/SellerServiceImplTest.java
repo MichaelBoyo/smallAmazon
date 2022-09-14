@@ -1,6 +1,6 @@
 package com.tbthecoder.smallamazon.services;
 
-import com.tbthecoder.smallamazon.dtos.AddProductRequest;
+import com.tbthecoder.smallamazon.dtos.ProductRequest;
 import com.tbthecoder.smallamazon.dtos.RegisterResponse;
 import com.tbthecoder.smallamazon.dtos.SellerRequest;
 import com.tbthecoder.smallamazon.dtos.Status;
@@ -27,10 +27,10 @@ class SellerServiceImplTest {
     private RegisterResponse res;
 
     @BeforeEach
-    void setUp() throws StoreNameTakenException, EmailExistsException {
+    void setUp() throws Exception{
         res = sellerService.register(new SellerRequest("08013297538", "storeEmailTest",
                 "12345", "personalEmail", "storeImageTest", "storeAddressTest", "storeNameTest",
-                "storeDescTest", "test-FirstName", "test-LastName"));
+                "storeDescTest", "test-FirstName", "test-LastName","re-psw"));
     }
 
     @AfterEach
@@ -75,7 +75,7 @@ class SellerServiceImplTest {
     @Test
     void addProduct() throws UserNotFoundException {
         var seller = sellerService.getSellerByEmail("personalEmail");
-        sellerService.addProduct(new AddProductRequest(seller.id(),"sanndal","fine sandal",
+        sellerService.addProduct(new ProductRequest(seller.id(),"sanndal","fine sandal",
                 65.6,45,"oka","lol"));
         seller = sellerService.getSellerByEmail("personalEmail");
 

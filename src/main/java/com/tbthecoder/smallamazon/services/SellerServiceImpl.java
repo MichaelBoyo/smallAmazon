@@ -1,27 +1,35 @@
 package com.tbthecoder.smallamazon.services;
 
+
+
 import com.tbthecoder.smallamazon.dtos.*;
 import com.tbthecoder.smallamazon.exceptions.EmailExistsException;
+import com.tbthecoder.smallamazon.exceptions.PasswordMisMatchException;
 import com.tbthecoder.smallamazon.exceptions.StoreNameTakenException;
 import com.tbthecoder.smallamazon.exceptions.UserNotFoundException;
 import com.tbthecoder.smallamazon.models.Product;
-import com.tbthecoder.smallamazon.models.Roles;
+
 import com.tbthecoder.smallamazon.models.Seller;
 import com.tbthecoder.smallamazon.models.Store;
 
 import com.tbthecoder.smallamazon.repositories.SellerRepository;
 
+import com.tbthecoder.smallamazon.services.interfaces.CustomerService;
 import com.tbthecoder.smallamazon.services.interfaces.ProductService;
 import com.tbthecoder.smallamazon.services.interfaces.SellerService;
 import com.tbthecoder.smallamazon.services.interfaces.StoreService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Set;
 
+
+import static com.tbthecoder.smallamazon.controller.utils.Validator.*;
 import static com.tbthecoder.smallamazon.dtos.Status.SUCCESS;
+import static com.tbthecoder.smallamazon.models.Roles.*;
 
 @Service
 @AllArgsConstructor
@@ -31,24 +39,22 @@ public class SellerServiceImpl implements SellerService {
     private final ProductService productService;
     private final StoreService storeService;
 
+    private final CustomerService customerService;
+
     @Override
-    public RegisterResponse register(SellerRequest sellerRequest) throws StoreNameTakenException, EmailExistsException {
+    public RegisterResponse register(SellerRequest sellerRequest) throws StoreNameTakenException, EmailExistsException, PasswordMisMatchException {
         checkIfExists(sellerRequest);
+        validatePassword(sellerRequest.toRegRequest());
+        validateEmail(sellerRequest.toRegRequest());
         Seller seller = Seller.builder()
                 .store(storeService.saveStore(sellerRequest)).build();
-        buildSellerPersonalData(sellerRequest, seller);
+        seller.setRoles(Set.of(SELLER));
+        customerService.buildCustomerData(sellerRequest.toRegRequest(), seller);
         sellerRepository.save(seller);
         return new RegisterResponse(SUCCESS, "Seller Registered successfully");
     }
 
-    private void buildSellerPersonalData(SellerRequest sellerRequest, Seller seller) {
-        seller.setPassword(sellerRequest.password());
-        seller.setFirstName(sellerRequest.firstName());
-        seller.setLastName(sellerRequest.lastName());
-        seller.setEmail(sellerRequest.email());
-        seller.setPhoneNumber(sellerRequest.phoneNumber());
-        seller.setRoles(Set.of(Roles.SELLER));
-    }
+
 
     private void checkIfExists(SellerRequest sellerRequest) throws EmailExistsException, StoreNameTakenException {
         if (sellerRepository.existsByEmail(sellerRequest.email())) {
@@ -88,10 +94,10 @@ public class SellerServiceImpl implements SellerService {
     }
 
     @Override
-    public Response addProduct(AddProductRequest addProductRequest) throws UserNotFoundException {
-        Seller seller = get(addProductRequest.sellerId());
+    public Response addProduct(ProductRequest productRequest) throws UserNotFoundException {
+        Seller seller = get(productRequest.sellerId());
         Store store = seller.getStore();
-        store.getProducts().add(product(addProductRequest));
+        store.getProducts().add(product(productRequest));
         storeService.save(store);
         sellerRepository.save(seller);
         return new Response(SUCCESS, "Product Added Successfully");
@@ -108,7 +114,7 @@ public class SellerServiceImpl implements SellerService {
         storeService.deleteAll();
     }
 
-    private Product product(AddProductRequest addProductRequest) {
-        return productService.saveProduct(addProductRequest);
+    private Product product(ProductRequest productRequest) {
+        return productService.saveProduct(productRequest);
     }
 }

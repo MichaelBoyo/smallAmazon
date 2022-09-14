@@ -1,6 +1,6 @@
 package com.tbthecoder.smallamazon.services;
 
-import com.tbthecoder.smallamazon.dtos.AddProductRequest;
+import com.tbthecoder.smallamazon.dtos.ProductRequest;
 import com.tbthecoder.smallamazon.dtos.Response;
 import com.tbthecoder.smallamazon.dtos.Status;
 import com.tbthecoder.smallamazon.exceptions.ProductNotFoundException;
@@ -18,14 +18,14 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
 
     @Override
-    public Product saveProduct(AddProductRequest addProductRequest) {
+    public Product saveProduct(ProductRequest productRequest) {
         return productRepository.save(Product.builder()
-                .name(addProductRequest.productName())
-                .description(addProductRequest.productDesc())
-                .price(addProductRequest.price())
-                .stockQty(addProductRequest.stockQty())
-                .category(addProductRequest.category())
-                .image(addProductRequest.image())
+                .name(productRequest.productName())
+                .description(productRequest.productDesc())
+                .price(productRequest.price())
+                .stockAvailable(productRequest.stockQty())
+                .category(productRequest.category())
+                .image(productRequest.image())
                 .build());
     }
 

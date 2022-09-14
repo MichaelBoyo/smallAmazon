@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.Collection;
 import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -24,8 +23,8 @@ class CustomerServiceImplTest {
 
 
     @BeforeEach
-    void setUp() throws EmailExistsException {
-        res = customerService.registerCustomer(new RegisterRequest("mikee", "1234", "Michael", "Boyo", "08103297538"));
+    void setUp() throws EmailExistsException, PasswordMisMatchException {
+        res = customerService.registerCustomer(new RegisterRequest("mikee", "1234", "Michael", "Boyo", "08103297538","1234"));
     }
 
     @AfterEach
@@ -71,7 +70,7 @@ class CustomerServiceImplTest {
     @Test
     void orderItems() throws UserNotFoundException, OutOfStockException, InvalidQuantityException, ProductNotFoundException {
         var product = Product.builder().build();
-        product.setStockQty(45);
+        product.setStockAvailable(45);
         product.setPrice(250.0);
         product.setName("bag");
         product = productService.save(product);

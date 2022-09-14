@@ -1,5 +1,6 @@
 package com.tbthecoder.smallamazon.services;
 
+import com.tbthecoder.smallamazon.controller.utils.Validator;
 import com.tbthecoder.smallamazon.dtos.*;
 import com.tbthecoder.smallamazon.exceptions.*;
 import com.tbthecoder.smallamazon.models.*;
@@ -10,26 +11,31 @@ import com.tbthecoder.smallamazon.services.interfaces.ItemService;
 import com.tbthecoder.smallamazon.services.interfaces.ProductService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Set;
 
+import static com.tbthecoder.smallamazon.controller.utils.Validator.*;
 import static com.tbthecoder.smallamazon.dtos.Status.SUCCESS;
+import static com.tbthecoder.smallamazon.models.Roles.*;
 
 @AllArgsConstructor
 @Service
 @Slf4j
 public class CustomerServiceImpl implements CustomerService {
     private final CustomerRepository customerRepository;
+    final PasswordEncoder passwordEncoder;
     private final CartService cartService;
-
     private final ItemService itemService;
     private final ProductService productService;
 
     @Override
-    public RegisterResponse registerCustomer(RegisterRequest request) throws EmailExistsException {
+    public RegisterResponse registerCustomer(RegisterRequest request) throws EmailExistsException, PasswordMisMatchException {
         if (customerRepository.existsByEmail(request.email())) throw new EmailExistsException("email used");
+        validatePassword(request);
+        validateEmail(request);
         Customer customer = Customer.builder()
                 .cart(cartService.saveCart(request))
                 .build();
@@ -38,14 +44,17 @@ public class CustomerServiceImpl implements CustomerService {
         return new RegisterResponse(SUCCESS, "Customer registered successfully");
     }
 
-    private void buildCustomerData(RegisterRequest request, Customer customer) {
-        customer.setPassword(request.password());
-        customer.setFirstName(request.firstName());
-        customer.setLastName(request.lastName());
+    @Override
+    public void buildCustomerData(RegisterRequest request, User customer) {
+        customer.setPassword(passwordEncoder.encode(request.password()));
+        customer.setFirstName(request.firstname());
+        customer.setLastName(request.lastname());
         customer.setEmail(request.email());
         customer.setPhoneNumber(request.phoneNumber());
-        customer.setRoles(Set.of(Roles.CUSTOMER));
+        customer.setRoles(Set.of(CUSTOMER));
+
     }
+
 
     private Customer get(String id) throws UserNotFoundException {
         return customerRepository.findById(id).orElseThrow(() -> new UserNotFoundException("user not found"));
@@ -92,12 +101,27 @@ public class CustomerServiceImpl implements CustomerService {
         return customerRepository.findCustomerByEmail(email).toCustomerResponse();
     }
 
+    @Override
+    public Response makeAdmin(String id) throws UserNotFoundException {
+        Customer customer = get(id);
+        customer.getRoles().add(Roles.ADMIN);
+        customerRepository.save(customer);
+        return new Response(SUCCESS, "now an Admin");
+    }
+
+    @Override
+    public Cart getCustomerCart(String id) throws UserNotFoundException {
+        log.info("getting cart for customer {}", id);
+        Customer customer = get(id);
+        return customer.getCart();
+    }
+
     private Product fetchProduct(OrderRequest request) throws ProductNotFoundException, OutOfStockException, InvalidQuantityException {
         Product product = productService.getProduct(request.productId());
-        if (product.getStockQty() == 0) throw new OutOfStockException("product Out of Stock");
-        if (request.quantity() > product.getStockQty())
-            throw new InvalidQuantityException("quantity ordered is not available, only " + product.getStockQty() + " units available");
-        product.setStockQty(product.getStockQty() - request.quantity());
+        if (product.getStockAvailable() == 0) throw new OutOfStockException("product Out of Stock");
+        if (request.quantity() > product.getStockAvailable())
+            throw new InvalidQuantityException("quantity ordered is not available, only " + product.getStockAvailable() + " units available");
+        product.setStockAvailable(product.getStockAvailable() - request.quantity());
         productService.save(product);
         return product;
     }

@@ -1,5 +1,5 @@
 package com.tbthecoder.smallamazon.models;
 
 public enum Roles {
-    BUYER, SELLER, CUSTOMER, ADMIN
+    SELLER, CUSTOMER, ADMIN, SUPER_ADMIN
 }

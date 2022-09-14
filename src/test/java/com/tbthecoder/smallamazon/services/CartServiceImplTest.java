@@ -18,10 +18,11 @@ public class CartServiceImplTest {
     private CartService cartService;
     private Cart cart;
 
-    @BeforeEach
-    void setUp() {
-        cart = cartService.saveCart(new RegisterRequest("", "", "", "", ""));
-    }
+//    @BeforeEach
+//    void setUp() {
+//        cart = cartService.saveCart()
+//    }
+
     @AfterEach
     void tearDown(){
         cartService.clearDataBase();
