@@ -1,9 +1,6 @@
 package com.tbthecoder.smallamazon.controller;
 
 import com.tbthecoder.smallamazon.dtos.*;
-import com.tbthecoder.smallamazon.exceptions.EmailExistsException;
-import com.tbthecoder.smallamazon.exceptions.PasswordMisMatchException;
-import com.tbthecoder.smallamazon.exceptions.StoreNameTakenException;
 import com.tbthecoder.smallamazon.exceptions.UserNotFoundException;
 import com.tbthecoder.smallamazon.services.interfaces.SellerService;
 import lombok.AllArgsConstructor;
@@ -14,8 +11,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
-import static com.tbthecoder.smallamazon.dtos.Status.FAILURE;
 
 @CrossOrigin
 @RestController

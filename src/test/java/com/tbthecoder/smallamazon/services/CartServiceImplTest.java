@@ -1,6 +1,6 @@
 package com.tbthecoder.smallamazon.services;
 
-import com.tbthecoder.smallamazon.dtos.RegisterRequest;
+import com.tbthecoder.smallamazon.dtos.UserRequest;
 import com.tbthecoder.smallamazon.exceptions.CartNotFoundException;
 import com.tbthecoder.smallamazon.models.Cart;
 import com.tbthecoder.smallamazon.services.interfaces.CartService;
@@ -18,10 +18,17 @@ public class CartServiceImplTest {
     private CartService cartService;
     private Cart cart;
 
-//    @BeforeEach
-//    void setUp() {
-//        cart = cartService.saveCart()
-//    }
+    @BeforeEach
+    void setUp() {
+        cart = cartService.saveCart(new UserRequest(
+                "testemail",
+                "testpassword",
+                "testfirstname",
+                "testlastname",
+                "testphone",
+                "testpassword"
+        ));
+    }
 
     @AfterEach
     void tearDown(){
@@ -53,6 +60,7 @@ public class CartServiceImplTest {
 
     @Test
     void save() {
+        cartService.save(cart);
         assertNotNull(cart);
     }
 }

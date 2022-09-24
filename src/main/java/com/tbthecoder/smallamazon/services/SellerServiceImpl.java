@@ -3,8 +3,8 @@ package com.tbthecoder.smallamazon.services;
 
 
 import com.tbthecoder.smallamazon.dtos.*;
-import com.tbthecoder.smallamazon.exceptions.EmailExistsException;
-import com.tbthecoder.smallamazon.exceptions.PasswordMisMatchException;
+import com.tbthecoder.smallamazon.exceptions.EmailException;
+import com.tbthecoder.smallamazon.exceptions.PasswordException;
 import com.tbthecoder.smallamazon.exceptions.StoreNameTakenException;
 import com.tbthecoder.smallamazon.exceptions.UserNotFoundException;
 import com.tbthecoder.smallamazon.models.Product;
@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Set;
 
 
-import static com.tbthecoder.smallamazon.controller.utils.Validator.*;
+import static com.tbthecoder.smallamazon.utils.Validator.*;
 import static com.tbthecoder.smallamazon.dtos.Status.SUCCESS;
 import static com.tbthecoder.smallamazon.models.Roles.*;
 
@@ -42,7 +42,7 @@ public class SellerServiceImpl implements SellerService {
     private final CustomerService customerService;
 
     @Override
-    public RegisterResponse register(SellerRequest sellerRequest) throws StoreNameTakenException, EmailExistsException, PasswordMisMatchException {
+    public RegisterResponse register(SellerRequest sellerRequest) throws StoreNameTakenException, EmailException, PasswordException {
         checkIfExists(sellerRequest);
         validatePassword(sellerRequest.toRegRequest());
         validateEmail(sellerRequest.toRegRequest());
@@ -56,9 +56,9 @@ public class SellerServiceImpl implements SellerService {
 
 
 
-    private void checkIfExists(SellerRequest sellerRequest) throws EmailExistsException, StoreNameTakenException {
+    private void checkIfExists(SellerRequest sellerRequest) throws EmailException, StoreNameTakenException {
         if (sellerRepository.existsByEmail(sellerRequest.email())) {
-            throw new EmailExistsException("email used");
+            throw new EmailException("email used");
         }
         if (storeService.existsByName(sellerRequest.storeName())) {
             throw new StoreNameTakenException("Store name taken, use a different one");

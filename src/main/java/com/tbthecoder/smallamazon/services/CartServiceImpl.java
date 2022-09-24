@@ -1,6 +1,6 @@
 package com.tbthecoder.smallamazon.services;
 
-import com.tbthecoder.smallamazon.dtos.RegisterRequest;
+import com.tbthecoder.smallamazon.dtos.UserRequest;
 import com.tbthecoder.smallamazon.dtos.Response;
 import com.tbthecoder.smallamazon.exceptions.CartNotFoundException;
 import com.tbthecoder.smallamazon.models.Cart;
@@ -21,7 +21,7 @@ public class CartServiceImpl implements CartService {
     private final CartRepository cartRepository;
 
     @Override
-    public Cart saveCart(RegisterRequest request) {
+    public Cart saveCart(UserRequest request) {
          return cartRepository.save(Cart.builder()
                          .products(new ArrayList<>())
                  .build());

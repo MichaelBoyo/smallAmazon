@@ -1,6 +1,5 @@
 package com.tbthecoder.smallamazon.services;
 
-import com.tbthecoder.smallamazon.controller.utils.Validator;
 import com.tbthecoder.smallamazon.dtos.*;
 import com.tbthecoder.smallamazon.exceptions.*;
 import com.tbthecoder.smallamazon.models.*;
@@ -17,7 +16,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Set;
 
-import static com.tbthecoder.smallamazon.controller.utils.Validator.*;
+import static com.tbthecoder.smallamazon.utils.Validator.*;
 import static com.tbthecoder.smallamazon.dtos.Status.SUCCESS;
 import static com.tbthecoder.smallamazon.models.Roles.*;
 
@@ -26,32 +25,33 @@ import static com.tbthecoder.smallamazon.models.Roles.*;
 @Slf4j
 public class CustomerServiceImpl implements CustomerService {
     private final CustomerRepository customerRepository;
-    final PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
     private final CartService cartService;
     private final ItemService itemService;
     private final ProductService productService;
 
     @Override
-    public RegisterResponse registerCustomer(RegisterRequest request) throws EmailExistsException, PasswordMisMatchException {
-        if (customerRepository.existsByEmail(request.email())) throw new EmailExistsException("email used");
+    public RegisterResponse registerCustomer(UserRequest request) throws EmailException, PasswordException {
+        if (customerRepository.existsByEmail(request.email())) throw new EmailException("email used");
+
         validatePassword(request);
         validateEmail(request);
         Customer customer = Customer.builder()
                 .cart(cartService.saveCart(request))
                 .build();
+        customer.setEmail(request.email());
         buildCustomerData(request, customer);
         customerRepository.save(customer);
         return new RegisterResponse(SUCCESS, "Customer registered successfully");
     }
 
     @Override
-    public void buildCustomerData(RegisterRequest request, User customer) {
-        customer.setPassword(passwordEncoder.encode(request.password()));
-        customer.setFirstName(request.firstname());
-        customer.setLastName(request.lastname());
-        customer.setEmail(request.email());
-        customer.setPhoneNumber(request.phoneNumber());
-        customer.setRoles(Set.of(CUSTOMER));
+    public void buildCustomerData(UserRequest request, User customer) {
+        if (request.firstname() != null) customer.setFirstName(request.firstname());
+        if (request.lastname() != null) customer.setLastName(request.lastname());
+        if (request.phoneNumber() != null) customer.setPhoneNumber(request.phoneNumber());
+        if (request.password() != null) customer.setPassword(passwordEncoder.encode(request.password()));
+        if (customer.getRoles() == null) customer.setRoles(Set.of(CUSTOMER));
 
     }
 
@@ -69,6 +69,19 @@ public class CustomerServiceImpl implements CustomerService {
     public Response deleteCustomer(String id) throws UserNotFoundException {
         customerRepository.delete(get(id));
         return new Response(SUCCESS, "Customer Deleted Successfully");
+    }
+
+    @Override
+    public Response updateCustomer(UserRequest request) throws UserNotFoundException {
+        Customer customer = getByEmail(request.email());
+        buildCustomerData(request, customer);
+        customerRepository.save(customer);
+        return new Response(SUCCESS, "Customer Updated Successfully");
+    }
+
+
+    private Customer getByEmail(String email) throws UserNotFoundException {
+        return customerRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException("user not found"));
     }
 
     @Override
@@ -97,8 +110,8 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public CustomerResponse geCustomerByEmail(String email) {
-        return customerRepository.findCustomerByEmail(email).toCustomerResponse();
+    public CustomerResponse getCustomerByEmail(String email) throws UserNotFoundException {
+        return getByEmail(email).toCustomerResponse();
     }
 
     @Override

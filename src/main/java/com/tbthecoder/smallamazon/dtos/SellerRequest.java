@@ -14,8 +14,8 @@ SellerRequest(String phoneNumber,
               String lastName,
               String repeat_password) {
 
-    public RegisterRequest toRegRequest() {
-        return new RegisterRequest(email, password, firstName, lastName,phoneNumber,repeat_password);
+    public UserRequest toRegRequest() {
+        return new UserRequest(email, password, firstName, lastName,phoneNumber,repeat_password);
     }
 }
 

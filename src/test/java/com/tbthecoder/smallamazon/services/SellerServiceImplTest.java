@@ -4,8 +4,6 @@ import com.tbthecoder.smallamazon.dtos.ProductRequest;
 import com.tbthecoder.smallamazon.dtos.RegisterResponse;
 import com.tbthecoder.smallamazon.dtos.SellerRequest;
 import com.tbthecoder.smallamazon.dtos.Status;
-import com.tbthecoder.smallamazon.exceptions.EmailExistsException;
-import com.tbthecoder.smallamazon.exceptions.StoreNameTakenException;
 import com.tbthecoder.smallamazon.exceptions.UserNotFoundException;
 import com.tbthecoder.smallamazon.services.interfaces.SellerService;
 import lombok.extern.slf4j.Slf4j;

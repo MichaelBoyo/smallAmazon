@@ -2,7 +2,7 @@ package com.tbthecoder.smallamazon.controller;
 
 import com.tbthecoder.smallamazon.dtos.CustomerResponse;
 import com.tbthecoder.smallamazon.dtos.OrderRequest;
-import com.tbthecoder.smallamazon.dtos.RegisterRequest;
+import com.tbthecoder.smallamazon.dtos.UserRequest;
 import com.tbthecoder.smallamazon.exceptions.*;
 import com.tbthecoder.smallamazon.services.interfaces.CustomerService;
 import lombok.AllArgsConstructor;
@@ -15,15 +15,17 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 @CrossOrigin
-@AllArgsConstructor
+
 @Slf4j
 @RestController
 @RequestMapping("api/v1/customer")
+@AllArgsConstructor
 public class CustomerController {
     private final CustomerService customerService;
 
+
     @PostMapping
-    public ResponseEntity<?> registerCustomer(@RequestBody RegisterRequest request) throws EmailExistsException, PasswordMisMatchException {
+    public ResponseEntity<?> registerCustomer(@RequestBody UserRequest request) throws EmailException, PasswordException {
         log.info("registering user {}", request);
         return new ResponseEntity<>(customerService.registerCustomer(request), HttpStatus.OK);
     }
@@ -32,6 +34,17 @@ public class CustomerController {
     public List<CustomerResponse> findAlCustomers() {
         log.info("getting all customers");
         return customerService.getAllCustomers();
+    }
+    @PreAuthorize("hasRole('ROLE_CUSTOMER')")
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getCustomer(@PathVariable String id) throws UserNotFoundException {
+        log.info("getting customer {}", id);
+        return new ResponseEntity<>(customerService.getCustomer(id), HttpStatus.OK);
+    }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteCustomer(@PathVariable String id) throws UserNotFoundException {
+        log.info("deleting customer {}", id);
+        return new ResponseEntity<>(customerService.deleteCustomer(id), HttpStatus.OK);
     }
     @PreAuthorize("hasRole('ROLE_SUPER_ADMIN')")
     @DeleteMapping("/all")
